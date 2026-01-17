@@ -32,6 +32,10 @@ cd frontend && npm start
 # Open browser → http://localhost:3000
 # Register account → test@cogniquest.com / Test123!
 # Take assessment → Play games → Check dashboard
+
+# 🏗️ FEATURED: Try System Builder (the core differentiator)
+# http://localhost:3000/system-builder
+# Experience: Pattern → Rule → System → AI Critique
 ```
 
 ---
@@ -105,6 +109,7 @@ After starting servers:
 | Progress | `/progress` | View analytics |
 | Achievements | `/achievements` | Check unlocks |
 | Leaderboard | `/leaderboard` | See rankings |
+| **System Builder** | `/system-builder` | **Pattern → Rule → System → AI Critique** |
 
 ---
 
