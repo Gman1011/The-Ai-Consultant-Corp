@@ -27,6 +27,32 @@ const problemSchema = new mongoose.Schema({
   skipped: {
     type: Boolean,
     default: false
+  },
+  // NEW: System Builder fields
+  systemBuilder: {
+    patternPhase: {
+      examples: [mongoose.Schema.Types.Mixed], // The patterns shown to user
+      userObservations: String // What patterns they noticed
+    },
+    rulePhase: {
+      userRule: String, // The rule they articulated
+      ruleQuality: Number // 0-100 score
+    },
+    systemPhase: {
+      systemDescription: String, // Their proposed system
+      systemType: String, // 'process', 'algorithm', 'framework', 'strategy'
+      systemComponents: [String], // Parts of their system
+      systemCreated: mongoose.Schema.Types.Mixed // Actual system they built
+    },
+    critiquePhase: {
+      aiCritique: String, // AI's detailed critique
+      strengths: [String], // What they did well
+      improvements: [String], // Areas to improve
+      novelty: Number, // 0-100 how creative/novel
+      completeness: Number, // 0-100 how complete
+      effectiveness: Number, // 0-100 how effective
+      overallScore: Number // 0-100 composite score
+    }
   }
 });
 
@@ -49,7 +75,8 @@ const gameSessionSchema = new mongoose.Schema({
       'ai-collaboration',
       'n-back',
       'working-memory',
-      'data-patterns'
+      'data-patterns',
+      'system-builder' // NEW: Pattern → Rule → System → AI Critique
     ],
     required: true
   },

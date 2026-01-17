@@ -81,6 +81,18 @@ router.get('/types', protect, async (req, res) => {
         skillTree: 'aiCollaboration',
         icon: '🤖',
         unlocked: req.user.currentLevel >= 10
+      },
+      {
+        id: 'system-builder',
+        name: 'System Builder',
+        description: 'Pattern → Rule → System → AI Critique: Build cognitive systems for the AGI age',
+        difficulty: 'All Levels',
+        estimatedTime: '15-30 minutes',
+        skillTree: 'systemsThinking',
+        icon: '🏗️',
+        unlocked: true, // Available to all - this is the core differentiator
+        featured: true,
+        tagline: 'The difference between a brain game and cognitive retooling'
       }
     ];
 
@@ -105,7 +117,7 @@ router.post('/start', [
   protect,
   body('gameType').isIn([
     'visual-pattern', 'sequence', 'spatial', 'logical',
-    'memory', 'speed', 'ai-collaboration'
+    'memory', 'speed', 'ai-collaboration', 'system-builder'
   ]).withMessage('Invalid game type')
 ], async (req, res) => {
   try {
@@ -658,5 +670,359 @@ function getNextSteps(gameSession, userProgress) {
 
   return steps;
 }
+
+// ============================================================================
+// SYSTEM BUILDER ENDPOINTS
+// Pattern → Rule → System → AI Critique
+// ============================================================================
+
+const SystemBuilderService = require('../services/systemBuilderService');
+
+// @desc    Start System Builder challenge
+// @route   POST /api/games/system-builder/start
+// @access  Private
+router.post('/system-builder/start', protect, async (req, res) => {
+  try {
+    const { difficulty } = req.body;
+    const userId = req.user._id;
+    const ageGroup = req.user.profile?.ageGroup || 'adult';
+
+    // Get user progress
+    let userProgress = await UserProgress.findOne({ userId });
+    if (!userProgress) {
+      userProgress = new UserProgress({ userId });
+      await userProgress.save();
+    }
+
+    // Determine difficulty (default to user level or requested)
+    const challengeDifficulty = difficulty || Math.min(20 + (userProgress.currentLevel * 2), 100);
+
+    // Generate challenge
+    const challenge = SystemBuilderService.generatePatternChallenge(challengeDifficulty, ageGroup);
+
+    // Create game session
+    const gameSession = new GameSession({
+      userId,
+      gameType: 'system-builder',
+      difficulty: challengeDifficulty,
+      level: userProgress.currentLevel,
+      startTime: new Date(),
+      status: 'in-progress'
+    });
+
+    // Add the challenge as a problem
+    gameSession.addProblem({
+      problemId: challenge.problemId,
+      difficulty: challengeDifficulty,
+      correctAnswer: null, // No single correct answer in system building
+      presented: new Date()
+    });
+
+    // Store challenge data in the problem's systemBuilder field
+    const problem = gameSession.problems[0];
+    problem.systemBuilder = {
+      patternPhase: {
+        examples: challenge.examples,
+        userObservations: null
+      },
+      rulePhase: {
+        userRule: null,
+        ruleQuality: 0
+      },
+      systemPhase: {
+        systemDescription: null,
+        systemType: null,
+        systemComponents: [],
+        systemCreated: null
+      },
+      critiquePhase: {
+        aiCritique: null,
+        strengths: [],
+        improvements: [],
+        novelty: 0,
+        completeness: 0,
+        effectiveness: 0,
+        overallScore: 0
+      }
+    };
+
+    await gameSession.save();
+
+    // Return challenge without hidden answers
+    res.status(201).json({
+      success: true,
+      session: {
+        _id: gameSession._id,
+        gameType: 'system-builder',
+        difficulty: challengeDifficulty,
+        problemId: challenge.problemId,
+        challenge: {
+          context: challenge.context,
+          examples: challenge.examples,
+          systemPrompt: challenge.systemPrompt,
+          patternType: challenge.patternType
+        },
+        currentPhase: 'pattern' // Start with pattern observation
+      }
+    });
+  } catch (error) {
+    console.error('Error starting system builder:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error starting system builder challenge',
+      error: error.message
+    });
+  }
+});
+
+// @desc    Submit pattern observations (Phase 1)
+// @route   POST /api/games/system-builder/:sessionId/pattern
+// @access  Private
+router.post('/system-builder/:sessionId/pattern', [
+  protect,
+  body('observations').isString().isLength({ min: 10 }).withMessage('Observations must be at least 10 characters')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const { sessionId } = req.params;
+    const { observations } = req.body;
+
+    const gameSession = await GameSession.findOne({
+      _id: sessionId,
+      userId: req.user._id,
+      status: 'in-progress',
+      gameType: 'system-builder'
+    });
+
+    if (!gameSession) {
+      return res.status(404).json({ success: false, message: 'Session not found' });
+    }
+
+    const problem = gameSession.problems[0];
+    if (!problem.systemBuilder) {
+      return res.status(400).json({ success: false, message: 'Invalid session structure' });
+    }
+
+    problem.systemBuilder.patternPhase.userObservations = observations;
+    await gameSession.save();
+
+    res.json({
+      success: true,
+      message: 'Pattern observations recorded',
+      nextPhase: 'rule'
+    });
+  } catch (error) {
+    console.error('Error submitting pattern observations:', error);
+    res.status(500).json({ success: false, message: 'Error recording observations', error: error.message });
+  }
+});
+
+// @desc    Submit articulated rule (Phase 2)
+// @route   POST /api/games/system-builder/:sessionId/rule
+// @access  Private
+router.post('/system-builder/:sessionId/rule', [
+  protect,
+  body('rule').isString().isLength({ min: 10 }).withMessage('Rule must be at least 10 characters')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const { sessionId } = req.params;
+    const { rule } = req.body;
+
+    const gameSession = await GameSession.findOne({
+      _id: sessionId,
+      userId: req.user._id,
+      status: 'in-progress',
+      gameType: 'system-builder'
+    });
+
+    if (!gameSession) {
+      return res.status(404).json({ success: false, message: 'Session not found' });
+    }
+
+    const problem = gameSession.problems[0];
+    if (!problem.systemBuilder || !problem.systemBuilder.patternPhase.userObservations) {
+      return res.status(400).json({
+        success: false,
+        message: 'Must complete pattern phase first'
+      });
+    }
+
+    // Evaluate rule quality (basic evaluation, AI will do deeper critique later)
+    const ruleEvaluation = SystemBuilderService.evaluateRule(rule, null, null);
+
+    problem.systemBuilder.rulePhase.userRule = rule;
+    problem.systemBuilder.rulePhase.ruleQuality = ruleEvaluation.score;
+
+    await gameSession.save();
+
+    res.json({
+      success: true,
+      message: 'Rule articulated successfully',
+      ruleQuality: ruleEvaluation.score,
+      feedback: ruleEvaluation.feedback,
+      nextPhase: 'system'
+    });
+  } catch (error) {
+    console.error('Error submitting rule:', error);
+    res.status(500).json({ success: false, message: 'Error recording rule', error: error.message });
+  }
+});
+
+// @desc    Submit system creation (Phase 3 - MANDATORY)
+// @route   POST /api/games/system-builder/:sessionId/system
+// @access  Private
+router.post('/system-builder/:sessionId/system', [
+  protect,
+  body('systemDescription').isString().isLength({ min: 50 }).withMessage('System description must be at least 50 characters'),
+  body('systemType').isIn(['process', 'algorithm', 'framework', 'strategy']).withMessage('Invalid system type'),
+  body('systemComponents').isArray({ min: 1 }).withMessage('Must include at least one system component')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const { sessionId } = req.params;
+    const { systemDescription, systemType, systemComponents, systemCreated } = req.body;
+
+    const gameSession = await GameSession.findOne({
+      _id: sessionId,
+      userId: req.user._id,
+      status: 'in-progress',
+      gameType: 'system-builder'
+    });
+
+    if (!gameSession) {
+      return res.status(404).json({ success: false, message: 'Session not found' });
+    }
+
+    const problem = gameSession.problems[0];
+    if (!problem.systemBuilder || !problem.systemBuilder.rulePhase.userRule) {
+      return res.status(400).json({
+        success: false,
+        message: 'Must complete rule phase first'
+      });
+    }
+
+    // Record system creation
+    problem.systemBuilder.systemPhase.systemDescription = systemDescription;
+    problem.systemBuilder.systemPhase.systemType = systemType;
+    problem.systemBuilder.systemPhase.systemComponents = systemComponents;
+    problem.systemBuilder.systemPhase.systemCreated = systemCreated || null;
+
+    await gameSession.save();
+
+    res.json({
+      success: true,
+      message: 'System created successfully! Preparing AI critique...',
+      nextPhase: 'critique'
+    });
+  } catch (error) {
+    console.error('Error submitting system:', error);
+    res.status(500).json({ success: false, message: 'Error recording system', error: error.message });
+  }
+});
+
+// @desc    Get AI critique (Phase 4 - Final)
+// @route   POST /api/games/system-builder/:sessionId/critique
+// @access  Private
+router.post('/system-builder/:sessionId/critique', protect, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    const gameSession = await GameSession.findOne({
+      _id: sessionId,
+      userId: req.user._id,
+      status: 'in-progress',
+      gameType: 'system-builder'
+    });
+
+    if (!gameSession) {
+      return res.status(404).json({ success: false, message: 'Session not found' });
+    }
+
+    const problem = gameSession.problems[0];
+    if (!problem.systemBuilder || !problem.systemBuilder.systemPhase.systemDescription) {
+      return res.status(400).json({
+        success: false,
+        message: 'Must complete system phase first'
+      });
+    }
+
+    // Get the original challenge data (we need to reconstruct it)
+    const challenge = {
+      context: 'Challenge context from pattern examples',
+      pattern: 'Pattern identified from examples',
+      rule: 'Rule from expected evaluation',
+      evaluationCriteria: {}
+    };
+
+    // Generate AI critique
+    const critique = await SystemBuilderService.generateAICritique(
+      problem.systemBuilder.systemPhase.systemDescription,
+      problem.systemBuilder.systemPhase.systemType,
+      problem.systemBuilder.systemPhase.systemComponents,
+      challenge,
+      problem.systemBuilder.rulePhase.userRule
+    );
+
+    // Store critique
+    problem.systemBuilder.critiquePhase = critique;
+    problem.answered = new Date();
+    problem.responseTime = problem.answered - problem.presented;
+
+    // Calculate overall success based on critique scores
+    const overallSuccess = critique.overallScore >= 60;
+    problem.correct = overallSuccess;
+
+    // Complete the session
+    gameSession.status = 'completed';
+    gameSession.results.totalProblems = 1;
+    gameSession.results.correctAnswers = overallSuccess ? 1 : 0;
+    gameSession.results.accuracy = overallSuccess ? 100 : critique.overallScore;
+
+    // Award XP based on quality of system
+    const baseXP = 100;
+    const qualityBonus = Math.round(critique.overallScore * 2); // Up to 200 bonus XP
+    gameSession.results.xpEarned = baseXP + qualityBonus;
+
+    gameSession.endTime = new Date();
+    gameSession.duration = Math.round((gameSession.endTime - gameSession.startTime) / 1000);
+
+    await gameSession.save();
+
+    // Update user progress
+    const userProgress = await UserProgress.findOne({ userId: gameSession.userId });
+    if (userProgress) {
+      await userProgress.addXP(gameSession.results.xpEarned);
+      await userProgress.save();
+    }
+
+    res.json({
+      success: true,
+      critique: critique,
+      xpEarned: gameSession.results.xpEarned,
+      sessionComplete: true,
+      message: critique.overallScore >= 70
+        ? '🎉 Excellent systems thinking! This is AGI-era cognitive work.'
+        : critique.overallScore >= 50
+        ? '💡 Good foundation. Keep building deeper systems.'
+        : '🔧 This is a start. Focus on creating implementable systems, not just ideas.'
+    });
+  } catch (error) {
+    console.error('Error generating critique:', error);
+    res.status(500).json({ success: false, message: 'Error generating AI critique', error: error.message });
+  }
+});
 
 module.exports = router;

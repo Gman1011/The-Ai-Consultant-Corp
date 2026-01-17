@@ -16,6 +16,7 @@ import GamePlay from './pages/GamePlay';
 import Progress from './pages/Progress';
 import Achievements from './pages/Achievements';
 import Leaderboard from './pages/Leaderboard';
+import SystemBuilder from './pages/SystemBuilder';
 
 function App() {
   return (
@@ -91,6 +92,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Leaderboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/system-builder"
+              element={
+                <ProtectedRoute>
+                  <SystemBuilder />
                 </ProtectedRoute>
               }
             />
