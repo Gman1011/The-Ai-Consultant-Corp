@@ -18,9 +18,14 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/vendors', require('./routes/vendors'));
 app.use('/api/locations', require('./routes/locations'));
 
+// Pattern Recognition Game Routes
+app.use('/api/assessments', require('./routes/assessments'));
+app.use('/api/games', require('./routes/games'));
+app.use('/api/progress', require('./routes/progress'));
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Food Truck API is running' });
+  res.json({ status: 'ok', message: 'CogniQuest Pattern Recognition API is running' });
 });
 
 // Error handling middleware
