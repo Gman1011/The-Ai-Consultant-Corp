@@ -56,6 +56,13 @@ groundworks-sentinel/
 
 All commands are run from `groundworks-sentinel/`.
 
+### Clickable — no install, no server
+
+Open **`standalone/sentinel.html`** directly in any browser (double-click it).
+It's a single self-contained file with the dashboard, the GARVIS data feed, and
+the SVG trend chart all inlined — no Node, no build, no network required. Use
+this when you just want to click in and look at the dashboard.
+
 Install everything once:
 
 ```bash

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Groundworks Sentinel</title>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --panel: #161b22;
+        --panel-2: #1c2330;
+        --border: #283040;
+        --text: #e6edf3;
+        --muted: #8b97a7;
+        --accent: #3b82f6;
+        --stable: #2ea043;
+        --watch: #d29922;
+        --alert: #f85149;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        --radius: 12px;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif;
+        background: radial-gradient(1200px 600px at 80% -10%, #16202e 0%, var(--bg) 60%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+      .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 18px 28px; border-bottom: 1px solid var(--border);
+        background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(8px);
+        position: sticky; top: 0; z-index: 10;
+      }
+      .brand { display: flex; align-items: center; gap: 14px; }
+      .brand-mark { font-size: 30px; color: var(--accent); filter: drop-shadow(0 0 10px rgba(59,130,246,.5)); }
+      .brand h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.2px; }
+      .brand h1 span { color: var(--accent); font-weight: 600; }
+      .tagline { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+      .topbar-meta { display: flex; align-items: center; gap: 14px; }
+      .updated { font-size: 12px; color: var(--muted); }
+      .refresh-btn {
+        background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+        border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer;
+        transition: border-color .15s, background .15s;
+      }
+      .refresh-btn:hover { border-color: var(--accent); background: #20283a; }
+      .layout { max-width: 1100px; margin: 0 auto; padding: 28px; }
+      .feed-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+      .feed-tag::before {
+        content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--stable);
+        box-shadow: 0 0 0 0 rgba(46,160,67,.7); animation: pulse-dot 2s infinite;
+      }
+      @keyframes pulse-dot {
+        0% { box-shadow: 0 0 0 0 rgba(46,160,67,.5); }
+        70% { box-shadow: 0 0 0 5px rgba(46,160,67,0); }
+        100% { box-shadow: 0 0 0 0 rgba(46,160,67,0); }
+      }
+      .feed-footer { max-width: 1100px; margin: 0 auto; padding: 18px 28px 36px; font-size: 12px; color: var(--muted); }
+      .feed-footer strong { color: var(--text); font-weight: 600; }
+      .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+      .stat-card {
+        background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 18px 20px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+      }
+      .stat-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+      .stat-card.stable::before { background: var(--stable); }
+      .stat-card.watch::before { background: var(--watch); }
+      .stat-card.alert::before { background: var(--alert); }
+      .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+      .stat-value { font-size: 32px; font-weight: 700; margin-top: 6px; }
+      .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+      .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+      .panel-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
+      .panel-head h2 { margin: 0; font-size: 16px; }
+      .filters { display: flex; gap: 8px; }
+      .chip { background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 6px 14px; font-size: 12px; cursor: pointer; transition: all .15s; }
+      .chip:hover { color: var(--text); }
+      .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .table-wrap { overflow-x: auto; }
+      .prop-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      .prop-table th { text-align: left; padding: 12px 20px; font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); border-bottom: 1px solid var(--border); }
+      .prop-table td { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+      .prop-table tbody tr { cursor: pointer; transition: background .12s; }
+      .prop-table tbody tr:hover { background: var(--panel-2); }
+      .prop-table tbody tr:last-child td { border-bottom: none; }
+      .prop-table .num { text-align: right; }
+      .prop-name { font-weight: 600; }
+      .prop-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+      .movement-val { font-variant-numeric: tabular-nums; font-weight: 600; }
+      .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+      .badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; }
+      .badge-Stable { background: rgba(46,160,67,.15); color: var(--stable); }
+      .badge-Stable::before { background: var(--stable); }
+      .badge-Watch { background: rgba(210,153,34,.15); color: var(--watch); }
+      .badge-Watch::before { background: var(--watch); }
+      .badge-Alert { background: rgba(248,81,73,.15); color: var(--alert); }
+      .badge-Alert::before { background: var(--alert); animation: pulse 1.8s infinite; }
+      @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(248,81,73,.6); }
+        70% { box-shadow: 0 0 0 6px rgba(248,81,73,0); }
+        100% { box-shadow: 0 0 0 0 rgba(248,81,73,0); }
+      }
+      .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 20; }
+      .drawer {
+        position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 92vw);
+        background: var(--panel); border-left: 1px solid var(--border);
+        box-shadow: -8px 0 30px rgba(0,0,0,.5); z-index: 21; padding: 24px;
+        overflow-y: auto; animation: slidein .2s ease;
+      }
+      @keyframes slidein { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      .drawer-close { position: absolute; top: 16px; right: 18px; background: none; border: none; color: var(--muted); font-size: 26px; line-height: 1; cursor: pointer; }
+      .drawer-close:hover { color: var(--text); }
+      .drawer h3 { margin: 0 0 2px; font-size: 18px; }
+      .drawer .drawer-city { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+      .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0; }
+      .meta-item { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+      .meta-item .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+      .meta-item .v { font-size: 15px; font-weight: 600; margin-top: 4px; }
+      .chart-box { margin-top: 22px; }
+      .chart-box h4 { margin: 0 0 10px; font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+      .trend-chart { width: 100%; height: auto; display: block; }
+      .axis-text { fill: var(--muted); font-size: 10px; }
+      .empty { padding: 40px; text-align: center; color: var(--muted); }
+      @media (max-width: 600px) { .layout { padding: 18px; } .topbar { padding: 14px 18px; } }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script>
+      // ===================================================================
+      // Groundworks Sentinel — self-contained build.
+      // All sensor data is collected by GARVIS and embedded here so the app
+      // runs with no server, no install, and no network. Double-click to use.
+      // ===================================================================
+
+      // GARVIS = Ground Analysis & Real-time Vigilance Intelligence System.
+      var GARVIS = {
+        name: 'GARVIS',
+        expansion: 'Ground Analysis & Real-time Vigilance Intelligence System',
+        feedStatus: 'online',
+      };
+
+      // Movement tiers (millimetres of cumulative ground movement).
+      var STABLE_THRESHOLD = 2.0;
+      var WATCH_THRESHOLD = 5.0;
+      function classify(mm) {
+        if (mm < STABLE_THRESHOLD) return 'Stable';
+        if (mm < WATCH_THRESHOLD) return 'Watch';
+        return 'Alert';
+      }
+
+      // Seed dataset — each property tracked by a GARVIS ground sensor.
+      var PROPERTIES = [
+        { id: 1, name: '1427 Palm Grove Lane', city: 'Orlando, FL', movement: 0.8, sensorId: 'GW-SENS-0142', foundation: 'Slab-on-grade', installed: '2024-03-11' },
+        { id: 2, name: '8932 Cypress Drive', city: 'Tampa, FL', movement: 4.2, sensorId: 'GW-SENS-0233', foundation: 'Pier & beam', installed: '2023-11-02' },
+        { id: 3, name: '204 Mockingbird Court', city: 'Jacksonville, FL', movement: 6.7, sensorId: 'GW-SENS-0319', foundation: 'Slab-on-grade', installed: '2023-06-18' },
+        { id: 4, name: '55 Harborview Terrace', city: 'Miami, FL', movement: 1.4, sensorId: 'GW-SENS-0407', foundation: 'Pile-supported', installed: '2024-01-27' },
+        { id: 5, name: '3110 Sandhill Road', city: 'Gainesville, FL', movement: 5.9, sensorId: 'GW-SENS-0512', foundation: 'Pier & beam', installed: '2023-09-09' },
+        { id: 6, name: '781 Lakeshore Boulevard', city: 'St. Petersburg, FL', movement: 0.3, sensorId: 'GW-SENS-0588', foundation: 'Slab-on-grade', installed: '2024-04-30' },
+      ];
+
+      function enrich(p) {
+        return Object.assign({}, p, {
+          status: classify(p.movement),
+          source: GARVIS.name,
+          lastReading: new Date(Date.now() - p.id * 7 * 60 * 1000).toISOString(),
+        });
+      }
+
+      // Deterministic 30-day movement series ending at the current reading.
+      function movementHistory(seed, current, points) {
+        points = points || 30;
+        var history = [];
+        var today = new Date();
+        for (var i = 0; i < points; i += 1) {
+          var day = new Date(today);
+          day.setDate(today.getDate() - (points - 1 - i));
+          var progress = i / (points - 1);
+          var base = current * (0.4 + 0.6 * progress);
+          var ripple = Math.sin((i + seed) * 0.7) * (current * 0.05);
+          var value = Math.max(0, Math.round((base + ripple) * 100) / 100);
+          history.push({ date: day.toISOString().slice(0, 10), movement: value });
+        }
+        return history;
+      }
+
+      function computeStats(list) {
+        var tiers = { Stable: 0, Watch: 0, Alert: 0 };
+        var movements = list.map(function (p) { tiers[classify(p.movement)] += 1; return p.movement; });
+        var total = list.length;
+        var sum = movements.reduce(function (a, b) { return a + b; }, 0);
+        return {
+          total: total,
+          stable: tiers.Stable,
+          watch: tiers.Watch,
+          alert: tiers.Alert,
+          avgMovement: total ? Math.round((sum / total) * 100) / 100 : 0,
+          maxMovement: total ? Math.max.apply(null, movements) : 0,
+          updated: new Date().toISOString(),
+          feed: GARVIS,
+        };
+      }
+
+      // ---- formatting helpers ----
+      var STATUS_COLORS = { Stable: '#2ea043', Watch: '#d29922', Alert: '#f85149' };
+      function statusColor(s) { return STATUS_COLORS[s] || '#3b82f6'; }
+      function formatMovement(mm) { return Number(mm).toFixed(1) + ' mm'; }
+      function timeAgo(iso) {
+        var diffMin = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+        if (diffMin < 1) return 'just now';
+        if (diffMin < 60) return diffMin + ' min ago';
+        return Math.round(diffMin / 60) + ' hr ago';
+      }
+      function esc(str) {
+        return String(str).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      // ---- dependency-free SVG trend chart ----
+      function trendChartSVG(history, status) {
+        var width = 380, height = 160, pad = { top: 12, right: 8, bottom: 22, left: 28 };
+        var values = history.map(function (h) { return h.movement; });
+        var maxVal = Math.max.apply(null, values.concat([1]));
+        var innerW = width - pad.left - pad.right;
+        var innerH = height - pad.top - pad.bottom;
+        var color = statusColor(status);
+        var x = function (i) { return pad.left + (i / (history.length - 1)) * innerW; };
+        var y = function (v) { return pad.top + innerH - (v / maxVal) * innerH; };
+        var line = history.map(function (h, i) {
+          return (i === 0 ? 'M' : 'L') + ' ' + x(i).toFixed(1) + ' ' + y(h.movement).toFixed(1);
+        }).join(' ');
+        var area = line + ' L ' + x(history.length - 1).toFixed(1) + ' ' + (pad.top + innerH) +
+          ' L ' + x(0).toFixed(1) + ' ' + (pad.top + innerH) + ' Z';
+        var grid = [0, 0.5, 1].map(function (f) {
+          var gy = pad.top + innerH - f * innerH;
+          return '<line x1="' + pad.left + '" y1="' + gy + '" x2="' + (width - pad.right) +
+            '" y2="' + gy + '" stroke="#283040" stroke-width="1" />' +
+            '<text x="4" y="' + (gy + 4) + '" class="axis-text">' + (maxVal * f).toFixed(1) + '</text>';
+        }).join('');
+        var tickIdx = [0, Math.floor((history.length - 1) / 2), history.length - 1];
+        var ticks = tickIdx.map(function (i) {
+          return '<text x="' + x(i) + '" y="' + (height - 6) + '" text-anchor="middle" class="axis-text">' +
+            history[i].date.slice(5) + '</text>';
+        }).join('');
+        return '<svg class="trend-chart" viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="30-day movement trend">' +
+          '<defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.35" />' +
+          '<stop offset="100%" stop-color="' + color + '" stop-opacity="0" /></linearGradient></defs>' +
+          grid +
+          '<path d="' + area + '" fill="url(#grad)" />' +
+          '<path d="' + line + '" fill="none" stroke="' + color + '" stroke-width="2" />' +
+          ticks + '</svg>';
+      }
+
+      // ---- app state + render ----
+      var state = { filter: 'all', selectedId: null };
+      var FILTERS = ['all', 'Alert', 'Watch', 'Stable'];
+
+      function render() {
+        var enriched = PROPERTIES.map(enrich);
+        var stats = computeStats(PROPERTIES);
+        var visible = state.filter === 'all'
+          ? enriched
+          : enriched.filter(function (p) { return p.status === state.filter; });
+        visible = visible.slice().sort(function (a, b) { return b.movement - a.movement; });
+
+        var statCards =
+          card('Properties', stats.total, 'under monitoring', '') +
+          card('Stable', stats.stable, 'within tolerance', 'stable') +
+          card('On watch', stats.watch, 'trending movement', 'watch') +
+          card('Alerts', stats.alert, 'crew dispatch', 'alert') +
+          card('Peak movement', stats.maxMovement.toFixed(1) + ' mm', stats.avgMovement.toFixed(1) + ' mm avg', '');
+
+        var rows = visible.map(function (p) {
+          return '<tr data-id="' + p.id + '">' +
+            '<td><div class="prop-name">' + esc(p.name) + '</div><div class="prop-sub">' + esc(p.sensorId) + '</div></td>' +
+            '<td>' + esc(p.city) + '</td>' +
+            '<td>' + esc(p.foundation) + '</td>' +
+            '<td class="num"><span class="movement-val">' + formatMovement(p.movement) + '</span></td>' +
+            '<td><span class="badge badge-' + p.status + '">' + p.status + '</span></td>' +
+            '<td>' + timeAgo(p.lastReading) + '</td></tr>';
+        }).join('');
+        if (!rows) rows = '<tr><td colspan="6" class="empty">No properties match this filter.</td></tr>';
+
+        var filters = FILTERS.map(function (f) {
+          return '<button class="chip' + (state.filter === f ? ' active' : '') + '" data-filter="' + f + '">' +
+            (f === 'all' ? 'All' : f) + '</button>';
+        }).join('');
+
+        document.getElementById('root').innerHTML =
+          '<header class="topbar"><div class="brand">' +
+            '<span class="brand-mark" aria-hidden="true">◬</span>' +
+            '<div><h1>Groundworks <span>Sentinel</span></h1><p class="tagline">Structural movement monitoring</p></div>' +
+          '</div><div class="topbar-meta">' +
+            '<span class="feed-tag" title="' + esc(stats.feed.expansion) + '">' + stats.feed.name + ' feed · ' + stats.feed.feedStatus + '</span>' +
+            '<span class="updated">Updated ' + new Date(stats.updated).toLocaleTimeString() + '</span>' +
+            '<button class="refresh-btn" id="refresh">Refresh</button>' +
+          '</div></header>' +
+          '<main class="layout">' +
+            '<section class="stats" aria-label="Fleet summary">' + statCards + '</section>' +
+            '<section class="panel"><div class="panel-head"><h2>Monitored properties</h2>' +
+              '<div class="filters" role="group" aria-label="Filter by status">' + filters + '</div></div>' +
+              '<div class="table-wrap"><table class="prop-table"><thead><tr>' +
+                '<th>Property</th><th>Location</th><th>Foundation</th><th class="num">Movement</th><th>Status</th><th>Last reading</th>' +
+              '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+            '</section>' +
+          '</main>' +
+          '<footer class="feed-footer">Sensor data collected by <strong>' + stats.feed.name + '</strong> — ' + esc(stats.feed.expansion) + '.</footer>' +
+          drawerHTML(enriched);
+
+        wire();
+      }
+
+      function card(label, value, sub, tier) {
+        return '<div class="stat-card' + (tier ? ' ' + tier : '') + '">' +
+          '<div class="stat-label">' + label + '</div>' +
+          '<div class="stat-value">' + value + '</div>' +
+          '<div class="stat-sub">' + sub + '</div></div>';
+      }
+
+      function drawerHTML(enriched) {
+        if (state.selectedId == null) return '';
+        var p = enriched.filter(function (x) { return x.id === state.selectedId; })[0];
+        if (!p) return '';
+        var history = movementHistory(p.id, p.movement);
+        return '<div class="drawer-overlay" id="overlay"></div>' +
+          '<aside class="drawer" aria-label="Property detail">' +
+            '<button class="drawer-close" id="drawer-close" aria-label="Close">×</button>' +
+            '<h3>' + esc(p.name) + '</h3><div class="drawer-city">' + esc(p.city) + '</div>' +
+            '<span class="badge badge-' + p.status + '">' + p.status + '</span>' +
+            '<div class="meta-grid">' +
+              metaItem('Movement', formatMovement(p.movement)) +
+              metaItem('Foundation', esc(p.foundation)) +
+              metaItem('Sensor', esc(p.sensorId)) +
+              metaItem('Installed', p.installed) +
+              metaItem('Data source', p.source) +
+              metaItem('Last reading', timeAgo(p.lastReading)) +
+            '</div>' +
+            '<div class="chart-box"><h4>30-day movement trend (mm)</h4>' + trendChartSVG(history, p.status) + '</div>' +
+          '</aside>';
+      }
+
+      function metaItem(k, v) {
+        return '<div class="meta-item"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>';
+      }
+
+      function wire() {
+        var refresh = document.getElementById('refresh');
+        if (refresh) refresh.onclick = render;
+        Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (btn) {
+          btn.onclick = function () { state.filter = btn.getAttribute('data-filter'); render(); };
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('.prop-table tbody tr[data-id]'), function (tr) {
+          tr.onclick = function () { state.selectedId = Number(tr.getAttribute('data-id')); render(); };
+        });
+        var close = document.getElementById('drawer-close');
+        var overlay = document.getElementById('overlay');
+        function closeDrawer() { state.selectedId = null; render(); }
+        if (close) close.onclick = closeDrawer;
+        if (overlay) overlay.onclick = closeDrawer;
+      }
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && state.selectedId != null) { state.selectedId = null; render(); }
+      });
+
+      render();
+    </script>
+  </body>
+</html>
