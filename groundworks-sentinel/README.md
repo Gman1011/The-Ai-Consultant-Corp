@@ -23,9 +23,11 @@ property's ground sensor and feeds the readings into the Sentinel API.
 ## Stack
 
 - **Backend** — Node + Express. In-memory seeded dataset (no database
-  required), so the API runs with zero external dependencies.
+  required), so the API runs with zero external dependencies. In production the
+  same server also serves the built React UI, so the whole app runs on **one
+  port** from a single process.
 - **Frontend** — React (Create React App), axios, a dependency-free SVG trend
-  chart.
+  chart. Calls the API at same-origin `/api`.
 
 ## Project layout
 
@@ -50,29 +52,40 @@ groundworks-sentinel/
         └── utils/format.js
 ```
 
-## Running locally
+## Running it
 
-Two terminals.
+All commands are run from `groundworks-sentinel/`.
 
-**Backend** (defaults to port `5050`):
-
-```bash
-cd groundworks-sentinel/backend
-npm install
-cp .env.example .env      # optional
-npm run dev               # or: npm start
-```
-
-**Frontend** (defaults to port `3000`):
+Install everything once:
 
 ```bash
-cd groundworks-sentinel/frontend
-npm install
-cp .env.example .env      # points at http://localhost:5050/api
-npm start
+npm run setup        # installs backend + frontend dependencies
 ```
 
-Open http://localhost:3000.
+### Operational (single port)
+
+Build the UI and serve the whole app — API and dashboard — from one Express
+process on port `5050`:
+
+```bash
+npm run serve        # builds the frontend, then starts the server
+# open http://localhost:5050
+```
+
+Already built? Just start it:
+
+```bash
+npm start            # serves the existing frontend/build + API on :5050
+```
+
+### Development (live reload, two servers)
+
+```bash
+npm run dev          # API on :5050 (nodemon) + CRA dev server on :3000
+# open http://localhost:3000   (proxies /api -> :5050)
+```
+
+> Port is configurable with `PORT` (see `backend/.env.example`).
 
 ## API
 

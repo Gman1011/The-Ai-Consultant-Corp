@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5050/api';
+// Same-origin by default: in production the Express server serves this build
+// and the API from one origin; in dev the CRA "proxy" forwards /api to :5050.
+const API_URL = process.env.REACT_APP_API_URL || '/api';
 
 // Create axios instance
 const api = axios.create({
