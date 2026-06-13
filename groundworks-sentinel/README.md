@@ -1,72 +1,87 @@
 # Groundworks Sentinel
 
-A structural movement monitoring dashboard. Properties instrumented with ground
-sensors report cumulative foundation movement (in millimetres); Sentinel
-classifies each site into a status tier and surfaces the fleet in a single
-operations view so crews can triage what needs attention.
+Structural movement monitoring dashboard. Sentinel tracks cumulative ground
+movement (in millimetres) at monitored properties and triages each site into a
+status tier so crews know where to look first.
+
+All sensor readings are collected by **GARVIS** — the *Ground Analysis &
+Real-time Vigilance Intelligence System* — the sensor network that polls each
+property's ground sensor and feeds the readings into the Sentinel API.
+
+> This is a standalone project. It shares the repo's stack (Node/Express +
+> React) but has no dependency on, or connection to, any other app in the
+> repository.
 
 ## Status tiers
 
-Movement is cumulative, measured in millimetres:
+| Tier   | Movement          | Meaning                              |
+| ------ | ----------------- | ------------------------------------ |
+| Stable | `< 2.0 mm`        | Within normal seasonal variation     |
+| Watch  | `2.0 – 4.99 mm`   | Trending — schedule an inspection    |
+| Alert  | `>= 5.0 mm`       | Active movement — dispatch a crew     |
 
-| Tier   | Range            | Meaning                              |
-|--------|------------------|--------------------------------------|
-| Stable | `< 2.0 mm`       | Within normal seasonal variation     |
-| Watch  | `2.0 – 5.0 mm`   | Trending — schedule an inspection    |
-| Alert  | `>= 5.0 mm`      | Active movement — dispatch a crew     |
+## Stack
 
-## Features
-
-- **Fleet summary** — counts per tier plus peak/average movement.
-- **Property table** — sortable by movement, filterable by status.
-- **Detail drawer** — per-property metadata and a 30-day movement trend chart.
-- **JSON API** — `/api/properties`, `/api/properties/<id>`, `/api/stats`.
-
-## Tech stack
-
-- **Backend**: Python + Flask
-- **Frontend**: Vanilla HTML/CSS/JS, [Chart.js](https://www.chartjs.org/) (CDN)
-- **Data**: In-memory mock dataset (swap for a database in production)
-
-## Running locally
-
-```bash
-cd groundworks-sentinel
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-python app.py
-```
-
-Then open <http://localhost:5000>.
-
-## API
-
-### `GET /api/properties`
-Returns all monitored properties with a derived `status` and `last_reading`.
-
-### `GET /api/properties/<id>`
-Returns a single property plus a 30-day `history` array for the trend chart.
-Responds `404` if the property does not exist.
-
-### `GET /api/stats`
-Returns fleet-wide counts (`stable`, `watch`, `alert`), `total`,
-`avg_movement`, `max_movement`, and an `updated` timestamp.
+- **Backend** — Node + Express. In-memory seeded dataset (no database
+  required), so the API runs with zero external dependencies.
+- **Frontend** — React (Create React App), axios, a dependency-free SVG trend
+  chart.
 
 ## Project layout
 
 ```
 groundworks-sentinel/
-├── app.py                 # Flask app + API + status model
-├── requirements.txt
-├── templates/
-│   └── dashboard.html
-└── static/
-    ├── css/styles.css
-    └── js/dashboard.js
+├── backend/
+│   └── src/
+│       ├── server.js            # Express app + health check
+│       ├── routes/
+│       │   ├── properties.js    # GET /api/properties[/:id]
+│       │   └── stats.js         # GET /api/stats (fleet summary + GARVIS feed)
+│       ├── data/properties.js   # seeded property/sensor records
+│       └── utils/
+│           ├── status.js        # movement -> Stable/Watch/Alert
+│           └── garvis.js        # GARVIS feed metadata
+└── frontend/
+    └── src/
+        ├── pages/Dashboard.js
+        ├── components/          # StatCard, StatusBadge, PropertyTable,
+        │                        #   PropertyDrawer, TrendChart
+        ├── services/api.js
+        └── utils/format.js
 ```
 
-## Notes
+## Running locally
 
-The dataset lives in memory in `app.py`. To go to production, replace the
-`properties` dict and `_movement_history()` with queries against a datastore fed
-by the field sensors; the status model (`classify`) and API shape stay the same.
+Two terminals.
+
+**Backend** (defaults to port `5050`):
+
+```bash
+cd groundworks-sentinel/backend
+npm install
+cp .env.example .env      # optional
+npm run dev               # or: npm start
+```
+
+**Frontend** (defaults to port `3000`):
+
+```bash
+cd groundworks-sentinel/frontend
+npm install
+cp .env.example .env      # points at http://localhost:5050/api
+npm start
+```
+
+Open http://localhost:3000.
+
+## API
+
+| Method | Endpoint               | Description                                        |
+| ------ | ---------------------- | -------------------------------------------------- |
+| GET    | `/api/health`          | Service + GARVIS feed status                       |
+| GET    | `/api/stats`           | Fleet summary counts, peak/avg movement, feed info |
+| GET    | `/api/properties`      | All monitored properties with derived status       |
+| GET    | `/api/properties/:id`  | One property plus a 30-day movement history series  |
+
+Every reading returned by the API is tagged with `source: "GARVIS"` to
+attribute the collection feed.
