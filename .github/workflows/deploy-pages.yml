@@ -1,0 +1,55 @@
+name: Deploy Sentinel to GitHub Pages
+
+# Publishes the self-contained Groundworks Sentinel dashboard
+# (groundworks-sentinel/standalone/sentinel.html) to GitHub Pages.
+on:
+  push:
+    branches:
+      - claude/groundworks-sentinel-dashboard-hi5fzb
+    paths:
+      - groundworks-sentinel/standalone/**
+      - .github/workflows/deploy-pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment, don't cancel an in-progress publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assemble static site
+        run: |
+          mkdir -p _site
+          cp groundworks-sentinel/standalone/sentinel.html _site/index.html
+
+      - name: Configure Pages (self-enable if needed)
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
