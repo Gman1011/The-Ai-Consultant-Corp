@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Groundworks Sentinel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">◬</span>
+      <div>
+        <h1>Groundworks <span>Sentinel</span></h1>
+        <p class="tagline">Structural movement monitoring</p>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span id="updated" class="updated">—</span>
+      <button id="refresh" class="refresh-btn" type="button">Refresh</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="stats" id="stats" aria-label="Fleet summary">
+      <!-- summary cards injected here -->
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Monitored properties</h2>
+        <div class="filters" id="filters" role="group" aria-label="Filter by status">
+          <button class="chip active" data-filter="all">All</button>
+          <button class="chip" data-filter="Alert">Alert</button>
+          <button class="chip" data-filter="Watch">Watch</button>
+          <button class="chip" data-filter="Stable">Stable</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="prop-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Location</th>
+              <th>Foundation</th>
+              <th class="num">Movement</th>
+              <th>Status</th>
+              <th>Last reading</th>
+            </tr>
+          </thead>
+          <tbody id="prop-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Detail drawer -->
+  <div class="drawer-overlay" id="overlay" hidden></div>
+  <aside class="drawer" id="drawer" hidden aria-label="Property detail">
+    <button class="drawer-close" id="drawer-close" type="button" aria-label="Close">×</button>
+    <div id="drawer-body"></div>
+  </aside>
+
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
