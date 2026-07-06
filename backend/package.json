@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest"
+    "test": "jest",
+    "render": "remotion render src/compositions/index.js out/video.mp4"
   },
   "keywords": ["food-truck", "api", "geolocation"],
   "author": "",
@@ -19,7 +20,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express-validator": "^7.0.1",
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "remotion": "^4.0.0",
+    "@remotion/cli": "^4.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
