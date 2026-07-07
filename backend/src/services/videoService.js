@@ -26,9 +26,12 @@ export const renderVideo = async (composition, options = {}) => {
       durationInFrames,
     });
 
+    const videoUrl = `/videos/${composition}.mp4`;
+
     return {
       success: true,
-      path: outputPath,
+      path: videoUrl,
+      url: videoUrl,
       message: `Video rendered successfully`,
     };
   } catch (error) {

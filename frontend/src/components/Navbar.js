@@ -18,6 +18,7 @@ const Navbar = () => {
                 Welcome, {user?.businessName}
               </span>
               <Link to="/vendor/dashboard">Dashboard</Link>
+              <Link to="/videos">🎬 Video Generator</Link>
               <button onClick={logout} className="logout">
                 Logout
               </button>
@@ -25,6 +26,7 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/">Find Food Trucks</Link>
+              <Link to="/videos">🎬 Video Generator</Link>
               <Link to="/vendor/login">Vendor Login</Link>
               <Link to="/vendor/register">Register Your Truck</Link>
             </>

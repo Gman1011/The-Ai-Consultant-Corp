@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import VendorLogin from './pages/VendorLogin';
 import VendorRegister from './pages/VendorRegister';
 import VendorDashboard from './pages/VendorDashboard';
+import VideoGenerator from './pages/VideoGenerator';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/vendor/login" element={<VendorLogin />} />
             <Route path="/vendor/register" element={<VendorRegister />} />
+            <Route path="/videos" element={<VideoGenerator />} />
             <Route
               path="/vendor/dashboard"
               element={

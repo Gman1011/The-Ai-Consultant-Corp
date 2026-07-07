@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/database');
 
 // Connect to MongoDB
@@ -13,10 +14,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve generated videos
+app.use('/videos', express.static(path.join(__dirname, '../out')));
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/vendors', require('./routes/vendors'));
 app.use('/api/locations', require('./routes/locations'));
+app.use('/api/videos', require('./routes/videos'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
