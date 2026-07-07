@@ -48,6 +48,18 @@ export const getCompositionConfig = (compositionId) => {
       height: 1080,
       durationInFrames: 150,
     },
+    StatsVideo: {
+      fps: 30,
+      width: 1920,
+      height: 1080,
+      durationInFrames: 300,
+    },
+    SocialMediaCard: {
+      fps: 30,
+      width: 1200,
+      height: 630,
+      durationInFrames: 240,
+    },
   };
 
   return compositions[compositionId] || null;
