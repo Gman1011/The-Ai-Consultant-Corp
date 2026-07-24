@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" role="img" aria-label="Lucky Scoops USA logo">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f83e96"/>
+      <stop offset="100%" stop-color="#8a4fe8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="80" cy="80" r="64" fill="#ffe4f1"/>
+  <circle cx="60" cy="64" r="13" fill="#ff9fce"/>
+  <circle cx="92" cy="56" r="11" fill="#c3a6ff"/>
+  <circle cx="108" cy="86" r="12" fill="#93ccff"/>
+  <circle cx="72" cy="98" r="12" fill="#a578f7"/>
+  <circle cx="98" cy="112" r="9" fill="#ffc9e3"/>
+  <circle cx="52" cy="112" r="8" fill="#c2e3ff"/>
+  <path d="M52 40 L60 24 L70 36 L80 20 L90 36 L100 24 L108 40 Z" fill="#f2c14e" stroke="#d9a52f" stroke-width="3" stroke-linejoin="round"/>
+  <text x="165" y="72" font-family="'Comic Sans MS', 'Chalkboard SE', cursive" font-size="52" font-weight="bold" fill="url(#lg)">Lucky Scoops</text>
+  <text x="167" y="122" font-family="'Comic Sans MS', 'Chalkboard SE', cursive" font-size="34" font-weight="bold" letter-spacing="14" fill="#8a4fe8">USA</text>
+</svg>

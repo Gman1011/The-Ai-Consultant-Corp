@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Scoop Surprise Smile">
+  <defs>
+    <radialGradient id="ghero" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#ffe4f1"/>
+      <stop offset="100%" stop-color="#ddcdff"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" rx="32" fill="url(#ghero)"/>
+  <circle cx="70" cy="70" r="10" fill="#ffffff" opacity="0.7"/>
+  <circle cx="340" cy="90" r="7" fill="#ffffff" opacity="0.6"/>
+  <circle cx="320" cy="330" r="9" fill="#ffffff" opacity="0.7"/>
+  <circle cx="80" cy="320" r="6" fill="#ffffff" opacity="0.5"/>
+  <path d="M200 150 c-30 -34 -84 -12 -84 30 c0 42 54 66 84 92 c30 -26 84 -50 84 -92 c0 -42 -54 -64 -84 -30 z" fill="#ffffff" opacity="0.9"/>
+  <circle cx="176" cy="196" r="12" fill="#ddcdff"/>
+  <circle cx="224" cy="196" r="12" fill="#ddcdff"/>
+  <circle cx="152" cy="176" r="9" fill="#ddcdff"/>
+  <circle cx="248" cy="176" r="9" fill="#ddcdff"/>
+  <ellipse cx="200" cy="226" rx="20" ry="16" fill="#ddcdff"/>
+  <text x="200" y="330" text-anchor="middle" font-family="'Trebuchet MS', sans-serif" font-size="26" font-weight="bold" fill="#5b2d91">Scoop Surprise Smile</text>
+</svg>

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Dior, a spotted puppy with black ears and a gold crown">
+  <defs>
+    <radialGradient id="bg2" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#efe8ff"/>
+      <stop offset="100%" stop-color="#ffe4f1"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" rx="32" fill="url(#bg2)"/>
+  <ellipse cx="200" cy="330" rx="120" ry="26" fill="#ffc9e3" opacity="0.6"/>
+  <!-- ears: black floppy -->
+  <ellipse cx="112" cy="168" rx="44" ry="74" fill="#2b2233" transform="rotate(20 112 168)"/>
+  <ellipse cx="288" cy="168" rx="44" ry="74" fill="#2b2233" transform="rotate(-20 288 168)"/>
+  <!-- body -->
+  <ellipse cx="200" cy="290" rx="90" ry="70" fill="#fdfbff"/>
+  <!-- head -->
+  <circle cx="200" cy="180" r="95" fill="#fdfbff"/>
+  <!-- spots -->
+  <circle cx="160" cy="130" r="9" fill="#2b2233"/>
+  <circle cx="238" cy="122" r="7" fill="#2b2233"/>
+  <circle cx="205" cy="148" r="5" fill="#2b2233"/>
+  <circle cx="130" cy="250" r="8" fill="#2b2233"/>
+  <circle cx="272" cy="244" r="6" fill="#2b2233"/>
+  <circle cx="236" cy="320" r="8" fill="#2b2233"/>
+  <circle cx="162" cy="316" r="6" fill="#2b2233"/>
+  <!-- crown -->
+  <path d="M155 96 L170 62 L188 88 L200 54 L212 88 L230 62 L245 96 Z" fill="#f2c14e" stroke="#d9a52f" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="170" cy="62" r="6" fill="#f2c14e" stroke="#d9a52f" stroke-width="3"/>
+  <circle cx="200" cy="54" r="6" fill="#f2c14e" stroke="#d9a52f" stroke-width="3"/>
+  <circle cx="230" cy="62" r="6" fill="#f2c14e" stroke="#d9a52f" stroke-width="3"/>
+  <path d="M196 84 l5 -5 l5 5 l-5 6 z" fill="#ff9fce"/>
+  <!-- eyes: one green, one blue -->
+  <circle cx="165" cy="180" r="24" fill="#2b2233"/>
+  <circle cx="165" cy="180" r="14" fill="#8bd48b"/>
+  <circle cx="171" cy="172" r="7" fill="#fff"/>
+  <circle cx="235" cy="180" r="24" fill="#2b2233"/>
+  <circle cx="235" cy="180" r="14" fill="#93ccff"/>
+  <circle cx="241" cy="172" r="7" fill="#fff"/>
+  <!-- blush -->
+  <ellipse cx="140" cy="216" rx="16" ry="9" fill="#ffc9e3"/>
+  <ellipse cx="260" cy="216" rx="16" ry="9" fill="#ffc9e3"/>
+  <!-- nose + open smile -->
+  <ellipse cx="200" cy="212" rx="13" ry="10" fill="#2b2233"/>
+  <path d="M182 230 q18 18 36 0 q-18 8 -36 0" fill="#b95f7d"/>
+  <!-- collar + tag -->
+  <path d="M132 252 q68 30 136 0 l0 14 q-68 30 -136 0 z" fill="#c3a6ff"/>
+  <circle cx="200" cy="280" r="4" fill="#d9a52f"/>
+  <path d="M200 286 l-13 10 a16 16 0 0 0 26 0 z" fill="#ffc9e3" stroke="#ff6ab2" stroke-width="2"/>
+  <!-- paws -->
+  <ellipse cx="150" cy="345" rx="28" ry="18" fill="#fdfbff"/>
+  <ellipse cx="250" cy="345" rx="28" ry="18" fill="#fdfbff"/>
+  <circle cx="150" cy="345" r="7" fill="#ffc9e3"/>
+  <circle cx="250" cy="345" r="7" fill="#ffc9e3"/>
+</svg>

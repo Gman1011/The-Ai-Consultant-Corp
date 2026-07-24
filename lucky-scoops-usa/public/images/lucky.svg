@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Lucky, a fluffy white puppy with a gold crown">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#ffe4f1"/>
+      <stop offset="100%" stop-color="#efe8ff"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" rx="32" fill="url(#bg)"/>
+  <ellipse cx="200" cy="330" rx="120" ry="26" fill="#ddcdff" opacity="0.6"/>
+  <!-- ears -->
+  <ellipse cx="118" cy="170" rx="42" ry="70" fill="#fdfbff" transform="rotate(18 118 170)"/>
+  <ellipse cx="282" cy="170" rx="42" ry="70" fill="#fdfbff" transform="rotate(-18 282 170)"/>
+  <!-- body -->
+  <ellipse cx="200" cy="290" rx="90" ry="70" fill="#fdfbff"/>
+  <!-- head -->
+  <circle cx="200" cy="180" r="95" fill="#fdfbff"/>
+  <!-- crown -->
+  <path d="M155 96 L170 62 L188 88 L200 54 L212 88 L230 62 L245 96 Z" fill="#f2c14e" stroke="#d9a52f" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="170" cy="62" r="6" fill="#f2c14e" stroke="#d9a52f" stroke-width="3"/>
+  <circle cx="200" cy="54" r="6" fill="#f2c14e" stroke="#d9a52f" stroke-width="3"/>
+  <circle cx="230" cy="62" r="6" fill="#f2c14e" stroke="#d9a52f" stroke-width="3"/>
+  <path d="M196 84 l5 -5 l5 5 l-5 6 z" fill="#c3a6ff"/>
+  <!-- eyes: one pink, one blue -->
+  <circle cx="165" cy="180" r="24" fill="#2b2233"/>
+  <circle cx="165" cy="180" r="14" fill="#ff9fce"/>
+  <circle cx="171" cy="172" r="7" fill="#fff"/>
+  <circle cx="235" cy="180" r="24" fill="#2b2233"/>
+  <circle cx="235" cy="180" r="14" fill="#93ccff"/>
+  <circle cx="241" cy="172" r="7" fill="#fff"/>
+  <!-- blush -->
+  <ellipse cx="140" cy="216" rx="16" ry="9" fill="#ffc9e3"/>
+  <ellipse cx="260" cy="216" rx="16" ry="9" fill="#ffc9e3"/>
+  <!-- nose + smile -->
+  <ellipse cx="200" cy="214" rx="12" ry="9" fill="#e8a3b8"/>
+  <path d="M200 223 q0 12 -14 14 M200 223 q0 12 14 14" stroke="#b98899" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- collar + tag -->
+  <path d="M132 252 q68 30 136 0 l0 14 q-68 30 -136 0 z" fill="#c3a6ff"/>
+  <circle cx="200" cy="280" r="4" fill="#9b9b9b"/>
+  <path d="M200 286 l-13 10 a16 16 0 0 0 26 0 z" fill="#ddcdff" stroke="#a578f7" stroke-width="2"/>
+  <!-- paws -->
+  <ellipse cx="150" cy="345" rx="28" ry="18" fill="#fdfbff"/>
+  <ellipse cx="250" cy="345" rx="28" ry="18" fill="#fdfbff"/>
+  <circle cx="150" cy="345" r="7" fill="#ffc9e3"/>
+  <circle cx="250" cy="345" r="7" fill="#ffc9e3"/>
+</svg>
